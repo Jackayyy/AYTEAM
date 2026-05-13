@@ -4,22 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>添加微信好友</title>
+<!-- 不蒜子免费统计，不用你任何服务器 -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <style>
 body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-ui;}
 .box{padding:30px 20px;}
 .wxid{font-size:24px;color:#2c5f2d;margin:20px 0;}
 .tip{font-size:18px;color:#2c5f2d;margin-bottom:20px;}
 .copy-btn{background:#25d366;color:#fff;border:none;padding:15px 40px;border-radius:8px;font-size:20px;cursor:pointer;}
-/* 这里修改了gif的样式，让它自适应手机屏幕 */
 .gif{
-    max-width: 100%;
-    width: 320px;
-    margin-top: 20px;
-    border-radius: 8px;
+    max-width:100%;
+    width:320px;
+    margin-top:20px;
+    border-radius:8px;
     box-shadow:0 2px 10px rgba(0,0,0,0.1);
-    /* 手机上不会超出屏幕 */
-    box-sizing: border-box;
+    box-sizing:border-box;
 }
+/* 隐藏统计数字，访客看不到 */
+#busuanzi_container_site_uv{display:none;}
 </style>
 </head>
 <body>
@@ -31,73 +33,42 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
     <img class="gif" src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF" alt="微信加好友步骤">
 </div>
 
+<!-- 隐藏的全局每日访客统计 -->
+<span id="busuanzi_container_site_uv">
+    <span id="busuanzi_value_site_uv"></span>
+</span>
+
 <script>
-// 获取今日日期
-function getToday() {
-    return new Date().toISOString().split('T')[0];
-}
-
-// 每日独立访客统计：进页面就计数，同设备当天只算1次
-function initVisitStat() {
-    const today = getToday();
-    const lastDay = localStorage.getItem('stat_day');
-    const isVisit = localStorage.getItem('is_visit_today');
-    let count = parseInt(localStorage.getItem('visit_total') || '0');
-
-    // 隔天清零
-    if (lastDay !== today) {
-        localStorage.setItem('stat_day', today);
-        localStorage.setItem('is_visit_today', 'no');
-        count = 0;
-    }
-
-    // 今日未访问过才+1
-    if (isVisit !== 'yes') {
-        count++;
-        localStorage.setItem('is_visit_today', 'yes');
-        localStorage.setItem('visit_total', count);
-    }
-}
-
-// 长按触发：手机 + 电脑通用
+// 手机 + 电脑 长按3秒弹出今日人数
 let pressTimer = null;
-const LONG_PRESS_TIME = 3000;
+const LONG_TIME = 3000;
 
-// 鼠标按下 / 手指按下
-function startPress(e) {
-    // 避免按到按钮时触发统计
-    if (e.target.tagName === 'BUTTON') return;
-    
-    pressTimer = setTimeout(() => {
-        let num = localStorage.getItem('visit_total') || 0;
+function pressStart(e){
+    // 按按钮不触发，只按空白处生效
+    if(e.target.tagName === 'BUTTON') return;
+    pressTimer = setTimeout(()=>{
+        let num = document.getElementById('busuanzi_value_site_uv').innerText;
         alert("📊 今日来访人数：" + num + " 人");
-    }, LONG_PRESS_TIME);
+    }, LONG_TIME);
 }
 
-// 鼠标松开 / 手指松开
-function endPress() {
-    if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-    }
+function pressEnd(){
+    if(pressTimer) clearTimeout(pressTimer);
 }
 
-// 绑定电脑鼠标 + 手机触屏
-document.addEventListener('mousedown', startPress);
-document.addEventListener('mouseup', endPress);
-document.addEventListener('mouseleave', endPress);
-document.addEventListener('touchstart', startPress);
-document.addEventListener('touchend', endPress);
-document.addEventListener('touchcancel', endPress);
+// 绑定鼠标+触屏
+document.addEventListener('mousedown', pressStart);
+document.addEventListener('mouseup', pressEnd);
+document.addEventListener('mouseleave', pressEnd);
+document.addEventListener('touchstart', pressStart);
+document.addEventListener('touchend', pressEnd);
+document.addEventListener('touchcancel', pressEnd);
 
 // 复制微信号
 function copyWx(){
     navigator.clipboard.writeText("N88385");
     alert("已复制！请按图中步骤添加好友");
 }
-
-// 页面加载自动统计
-initVisitStat();
 </script>
 </body>
 </html>
