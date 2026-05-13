@@ -20,9 +20,13 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
     box-shadow:0 2px 10px rgba(0,0,0,0.1);
     box-sizing:border-box;
 }
-/* 关键：把统计元素完全隐藏，页面上看不到 */
-#busuanzi_container_site_pv {
-    display: none;
+/* 关键：彻底隐藏统计元素，不会出现在页面上 */
+#busuanzi_container_site_uv {
+    display: none !important;
+    visibility: hidden;
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
 }
 </style>
 </head>
@@ -35,22 +39,22 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
     <img class="gif" src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF" alt="微信加好友步骤">
 </div>
 
-<!-- 隐藏的PV统计模块（页面上完全看不到） -->
-<span id="busuanzi_container_site_pv">
-    <span id="busuanzi_value_site_pv"></span>
+<!-- 隐藏的UV统计模块（页面上完全看不到） -->
+<span id="busuanzi_container_site_uv">
+    <span id="busuanzi_value_site_uv"></span>
 </span>
 
 <script>
-// 长按3秒弹出访问次数（手机+电脑通用）
+// 长按3秒弹出今日访客数（手机+电脑通用）
 let pressTimer = null;
 const LONG_PRESS_TIME = 3000;
 
 function pressStart(e) {
     // 按按钮不触发，只按空白处生效
-    if (e.target.tagName === 'BUTTON') return;
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'IMG') return;
     pressTimer = setTimeout(() => {
-        let count = document.getElementById('busuanzi_value_site_pv').innerText;
-        alert("📊 今日访问次数：" + count + " 次");
+        let count = document.getElementById('busuanzi_value_site_uv').innerText;
+        alert("📊 今日来访人数：" + count + " 人");
     }, LONG_PRESS_TIME);
 }
 
