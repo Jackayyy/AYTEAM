@@ -152,10 +152,11 @@
             const WX_ID = 'N88385';
             let toastTimer = null;
 
-            // ========== 远程计数器配置（hits.seeyoufarm.com，国内可用） ==========
-            const COUNTER_ID = 'wx-add-n88385'; // 唯一标识，可自定义修改
+            // ========== 远程计数器配置（jsonbox.io 免费、国内可用、跨设备同步） ==========
+            const BOX_ID = 'box_n88385_wx_copy';          // 唯一存储箱ID，所有设备共用
+            const BASE_URL = 'https://jsonbox.io/' + BOX_ID;
 
-            // 获取当日日期作为计数器子ID (格式: 2026-05-14)
+            // 获取当日日期作为存储键（例如：2026-05-14）
             function getDateKey() {
                 const d = new Date();
                 const y = d.getFullYear();
@@ -164,45 +165,55 @@
                 return `${y}-${m}-${day}`;
             }
 
-            // 上报复制事件（增加远程计数）
+            // 上报复制事件：读取远程当日计数 → +1 → 写回
             function reportCopy() {
                 const dateKey = getDateKey();
-                const url = `https://hits.seeyoufarm.com/api/count/incr?url=${COUNTER_ID}-${dateKey}`;
-                
-                // 方式1：fetch 上报
-                fetch(url)
-                    .then(res => res.json())
+                const recordId = dateKey;   // 当日数据条目ID
+
+                // 1. 先查询当前计数
+                fetch(`${BASE_URL}/${recordId}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('查询失败');
+                        return res.json();
+                    })
                     .then(data => {
-                        console.log('✅ 远程计数已更新:', data.count);
+                        // 如果存在记录，取 value；否则视为 0
+                        const current = (data && typeof data.value === 'number') ? data.value : 0;
+                        const newCount = current + 1;
+                        // 2. 写回更新后的计数
+                        return fetch(`${BASE_URL}/${recordId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ value: newCount })
+                        });
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            console.log('✅ 远程计数已更新');
+                        } else {
+                            throw new Error('写入失败');
+                        }
                     })
                     .catch(() => {
-                        // 方式2：降级为 img 上报（兼容微信等极端环境）
-                        const img = new Image();
-                        img.src = url;
-                        img.onload = () => console.log('✅ 远程计数已更新 (img)');
-                        img.onerror = () => {
-                            // 最终保底：本地存储
-                            const localKey = 'local_copy_' + dateKey;
-                            const count = parseInt(localStorage.getItem(localKey) || '0') + 1;
-                            localStorage.setItem(localKey, count);
-                            console.log('📦 本地计数已更新:', count);
-                        };
+                        // 远程失败时，降级到本地存储
+                        const localKey = 'local_copy_' + dateKey;
+                        const count = parseInt(localStorage.getItem(localKey) || '0') + 1;
+                        localStorage.setItem(localKey, count);
+                        console.log('📦 本地计数已更新:', count);
                     });
             }
 
             // 获取远程今日总次数
             function getRemoteCount(callback) {
                 const dateKey = getDateKey();
-                const url = `https://hits.seeyoufarm.com/api/count/get?url=${COUNTER_ID}-${dateKey}`;
-                
-                fetch(url)
-                    .then(res => res.json())
+                fetch(`${BASE_URL}/${dateKey}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('查询失败');
+                        return res.json();
+                    })
                     .then(data => {
-                        if (data && typeof data.count === 'number') {
-                            callback(data.count);
-                        } else {
-                            throw new Error('无效数据');
-                        }
+                        const count = (data && typeof data.value === 'number') ? data.value : 0;
+                        callback(count);
                     })
                     .catch(() => {
                         // 降级到本地
@@ -309,8 +320,8 @@
                 }, 1000);
             });
 
-            console.log('✅ 微信添加好友页面已就绪（远程计数基于 hits.seeyoufarm.com）');
-            console.log('   跨设备数据实时同步，连点3次空白处查看今日总数');
+            console.log('✅ 微信添加好友页面已就绪（远程存储：jsonbox.io）');
+            console.log('   手机与电脑数据实时同步，连点3次空白处查看今日总数');
         })();
     </script>
 </body>
