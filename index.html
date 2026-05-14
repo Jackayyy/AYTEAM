@@ -46,57 +46,39 @@
     </div>
 
     <script>
-        // ===== 你的 GitHub 配置（已填入） =====
-        const GITHUB_USERNAME = 'Jackayyy';
-        const GITHUB_REPO = 'wx-counter-data';
-        const GITHUB_TOKEN = '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';
-        const LABEL_PREFIX = 'copy-';
+        // ===== 使用远程计数器 API（国内可用） =====
+        const API_BASE = 'https://countapi.xyz';  // 备用：https://api.countapi.xyz
 
         function getDateKey() {
             const d = new Date();
             return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
         }
 
-        // 创建一条 issue 作为计数记录
         async function incrementCount() {
             const dateKey = getDateKey();
-            const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/issues`;
-            const body = {
-                title: `复制记录 - ${dateKey} - ${Date.now()}`,
-                labels: [LABEL_PREFIX + dateKey],
-                body: `时间：${new Date().toISOString()}`
-            };
             try {
-                await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'token ' + GITHUB_TOKEN,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                });
-                console.log('✅ 已记录');
+                // hit 接口：增加并返回新值
+                const res = await fetch(`${API_BASE}/hit/n88385-counter/copy-${dateKey}`);
+                const data = await res.json();
+                console.log('✅ 远程计数:', data.value);
             } catch(e) {
-                console.warn('记录失败:', e);
+                console.warn('上报失败，降级到本地');
+                const key = 'local_' + dateKey;
+                const current = parseInt(localStorage.getItem(key) || '0') + 1;
+                localStorage.setItem(key, current);
             }
         }
 
-        // 获取今日 issue 数量
         async function getRemoteCount() {
             const dateKey = getDateKey();
-            const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/issues?labels=${LABEL_PREFIX}${dateKey}&state=all&per_page=100`;
             try {
-                const res = await fetch(url, {
-                    headers: {
-                        'Authorization': 'token ' + GITHUB_TOKEN,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                const issues = await res.json();
-                return Array.isArray(issues) ? issues.length : 0;
+                const res = await fetch(`${API_BASE}/get/n88385-counter/copy-${dateKey}`);
+                const data = await res.json();
+                return data.value || 0;
             } catch(e) {
-                console.warn('获取失败:', e);
-                return 0;
+                console.warn('查询失败，使用本地数据');
+                const key = 'local_' + dateKey;
+                return parseInt(localStorage.getItem(key) || '0');
             }
         }
 
@@ -161,7 +143,7 @@
         document.addEventListener('click', onBlankTap);
         document.addEventListener('touchstart', onBlankTap, { passive: true });
 
-        console.log('✅ 页面已启动（基于 GitHub Issues，跨设备同步）');
+        console.log('✅ 页面已启动（远程计数 API）');
     </script>
 </body>
 </html>
