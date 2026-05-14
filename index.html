@@ -2,10 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>添加微信好友</title>
     <style>
         :root { --green:#25d366; }
@@ -28,7 +26,6 @@
         .toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-120px); background:#333; color:#fff; padding:12px 24px; border-radius:30px; font-size:15px; z-index:999; transition:transform 0.35s ease; pointer-events:none; }
         .toast.show { transform:translateX(-50%) translateY(0); }
         .toast.success { background:#25d366; }
-        .fallback-text { display:none; padding:20px; color:#666; font-size:14px; text-align:center; }
     </style>
 </head>
 <body>
@@ -42,71 +39,66 @@
             <div class="wxid" id="wxidText">N88385</div>
         </div>
         <button class="copy-btn" id="copyBtn">📋 点击复制微信号</button>
-        <div class="gif-wrapper" id="gifWrapper">
-            <!-- 主图：使用 jsdelivr CDN，国内速度快 -->
-            <img class="gif" id="gifImg"
-                 src="https://cdn.jsdelivr.net/gh/Jackayyy/AYTEAM@main/wx.GIF"
-                 alt="添加微信教程"
-                 loading="eager"
-                 onerror="handleGifError()">
-            <div class="fallback-text" id="fallbackText">
-                📱 请打开微信<br>点击右上角 ➕<br>选择「添加朋友」<br>搜索 <strong>N88385</strong>
-            </div>
+        <div class="gif-wrapper">
+            <img class="gif" src="https://cdn.jsdelivr.net/gh/Jackayyy/AYTEAM@main/wx.GIF" alt="教程" onerror="this.style.display='none';document.getElementById('fallback').style.display='block';">
+            <div id="fallback" style="display:none;padding:20px;color:#666;">📱 打开微信 → 搜索 <strong>N88385</strong> → 添加好友</div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCtopFoYuxVxW5nkvX5wML4ckk25Pgqzws",
-            authDomain: "aayy-636ae.firebaseapp.com",
-            projectId: "aayy-636ae",
-            storageBucket: "aayy-636ae.firebasestorage.app",
-            messagingSenderId: "1042761346693",
-            appId: "1:1042761346693:web:48505c61668587c4dcc3ec"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    <script>
+        // ===== 你的 GitHub 配置（已填入） =====
+        const GITHUB_USERNAME = 'Jackayyy';
+        const GITHUB_REPO = 'wx-counter-data';
+        const GITHUB_TOKEN = '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';
+        const LABEL_PREFIX = 'copy-';
 
         function getDateKey() {
             const d = new Date();
             return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
         }
 
+        // 创建一条 issue 作为计数记录
         async function incrementCount() {
             const dateKey = getDateKey();
-            const docRef = doc(db, "daily_counts", dateKey);
+            const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/issues`;
+            const body = {
+                title: `复制记录 - ${dateKey} - ${Date.now()}`,
+                labels: [LABEL_PREFIX + dateKey],
+                body: `时间：${new Date().toISOString()}`
+            };
             try {
-                await updateDoc(docRef, { count: increment(1) });
-                console.log('✅ 远程计数已更新');
-            } catch (e) {
-                await setDoc(docRef, { count: 1 });
-                console.log('✅ 远程计数已创建');
+                await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'token ' + GITHUB_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                console.log('✅ 已记录');
+            } catch(e) {
+                console.warn('记录失败:', e);
             }
         }
 
+        // 获取今日 issue 数量
         async function getRemoteCount() {
             const dateKey = getDateKey();
-            const snap = await getDoc(doc(db, "daily_counts", dateKey));
-            return snap.exists() ? snap.data().count : 0;
+            const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/issues?labels=${LABEL_PREFIX}${dateKey}&state=all&per_page=100`;
+            try {
+                const res = await fetch(url, {
+                    headers: {
+                        'Authorization': 'token ' + GITHUB_TOKEN,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                const issues = await res.json();
+                return Array.isArray(issues) ? issues.length : 0;
+            } catch(e) {
+                console.warn('获取失败:', e);
+                return 0;
+            }
         }
-
-        // GIF 加载失败时显示文字教程
-        window.handleGifError = function() {
-            document.getElementById('gifImg').style.display = 'none';
-            document.getElementById('fallbackText').style.display = 'block';
-            // 还可以尝试第二个备用链接
-            const backupImg = new Image();
-            backupImg.onload = function() {
-                document.getElementById('gifImg').src = 'https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF';
-                document.getElementById('gifImg').style.display = 'block';
-                document.getElementById('fallbackText').style.display = 'none';
-            };
-            backupImg.src = 'https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF';
-        };
 
         const WX_ID = 'N88385';
         const copyBtn = document.getElementById('copyBtn');
@@ -131,8 +123,6 @@
             flashBox();
             showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
             await incrementCount();
-            const total = await getRemoteCount();
-            console.log('📊 当前总复制次数：' + total);
         }
 
         copyBtn.addEventListener('click', () => {
@@ -171,7 +161,7 @@
         document.addEventListener('click', onBlankTap);
         document.addEventListener('touchstart', onBlankTap, { passive: true });
 
-        console.log('✅ 页面已启动');
+        console.log('✅ 页面已启动（基于 GitHub Issues，跨设备同步）');
     </script>
 </body>
 </html>
