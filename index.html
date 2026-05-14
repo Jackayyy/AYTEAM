@@ -29,64 +29,74 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
 </div>
 
 <script>
-// 获取今日日期
+// 今日日期
 function getTodayStr() {
   const d = new Date();
   return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
 }
-
 const today = getTodayStr();
-// 隔天清空
-if(localStorage.getItem('stat_today') !== today){
-    localStorage.setItem('stat_today', today);
-    localStorage.setItem('stat_count', 0);
-    localStorage.setItem('stat_visited', '');
+
+// 隔天重置所有统计
+if(localStorage.getItem('todayDate') !== today){
+    localStorage.setItem('todayDate', today);
+    localStorage.setItem('visitCount', 0);
+    localStorage.setItem('deviceList', '');
 }
 
-// 生成设备简易标识
-function getDeviceId(){
-  let id = localStorage.getItem('dev_id');
-  if(!id){
-    id = Math.random().toString(36).slice(2);
-    localStorage.setItem('dev_id', id);
-  }
-  return id;
+// 生成随机设备标识
+function getDeviceID(){
+    let did = localStorage.getItem('did');
+    if(!did){
+        did = Math.random().toString(36).substr(2,10);
+        localStorage.setItem('did', did);
+    }
+    return did;
 }
 
-const devId = getDeviceId();
-const visitedList = localStorage.getItem('stat_visited').split(',');
+const did = getDeviceID();
+let list = localStorage.getItem('deviceList') || '';
+let arr = list ? list.split(',') : [];
 
-// 该设备今日没进来过才计数
-if(!visitedList.includes(devId)){
-    let cnt = parseInt(localStorage.getItem('stat_count')) || 0;
-    cnt++;
-    localStorage.setItem('stat_count', cnt);
-    visitedList.push(devId);
-    localStorage.setItem('stat_visited', visitedList.join(','));
+// 今天没记录过才计数
+if(!arr.includes(did)){
+    let num = parseInt(localStorage.getItem('visitCount')) || 0;
+    num++;
+    localStorage.setItem('visitCount', num);
+    arr.push(did);
+    localStorage.setItem('deviceList', arr.join(','));
 }
 
-// 长按3秒查看人数 忽略按钮和图片
+// ========== 长按查看人数 修复版 ==========
 let pressTimer = null;
-function onStart(e){
-    if(e.target.tagName === 'BUTTON' || e.target.tagName === 'IMG') return;
+const LONG_TIME = 3000;
+
+// 只在页面空白处长按生效
+document.body.addEventListener('touchstart', function(e){
+    let tar = e.target;
+    // 按按钮、图片不触发
+    if(tar.tagName === 'BUTTON' || tar.tagName === 'IMG') return;
     pressTimer = setTimeout(()=>{
-        let num = localStorage.getItem('stat_count');
-        alert("📊 今日来访人数：" + num + " 人");
-    }, 3000);
-}
-function onEnd(){
-    clearTimeout(pressTimer);
-}
+        let n = localStorage.getItem('visitCount');
+        alert("📊 今日来访人数：" + n + " 人");
+    }, LONG_TIME);
+});
 
-// 绑定鼠标+触屏
-document.addEventListener('mousedown', onStart);
-document.addEventListener('mouseup', onEnd);
-document.addEventListener('mouseleave', onEnd);
-document.addEventListener('touchstart', onStart);
-document.addEventListener('touchend', onEnd);
-document.addEventListener('touchcancel', onEnd);
+document.body.addEventListener('touchend', ()=>clearTimeout(pressTimer));
+document.body.addEventListener('touchcancel', ()=>clearTimeout(pressTimer));
 
-// 复制微信号
+// 电脑鼠标长按也支持
+document.body.addEventListener('mousedown', function(e){
+    let tar = e.target;
+    if(tar.tagName === 'BUTTON' || tar.tagName === 'IMG') return;
+    pressTimer = setTimeout(()=>{
+        let n = localStorage.getItem('visitCount');
+        alert("📊 今日来访人数：" + n + " 人");
+    }, LONG_TIME);
+});
+document.body.addEventListener('mouseup', ()=>clearTimeout(pressTimer));
+document.body.addEventListener('mouseleave', ()=>clearTimeout(pressTimer));
+
+// 复制功能
 function copyWx(){
     navigator.clipboard.writeText("N88385");
     alert("已复制！请按图中步骤添加好友");
