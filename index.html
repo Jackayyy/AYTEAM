@@ -5,107 +5,28 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>添加微信好友</title>
     <style>
-        :root {
-            --green: #25d366;
-            --dark-green: #2c5f2d;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text: #1a1a1a;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: linear-gradient(160deg, #e8f5e9 0%, #f0f2f5 30%, #ffffff 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 36px 28px 28px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: var(--shadow);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #25d366, #1ebe5c, #25d366);
-            border-radius: 20px 20px 0 0;
-        }
-        .icon-wechat {
-            width: 56px; height: 56px;
-            background: #25d366;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center; justify-content: center;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
-        }
-        .icon-wechat svg { width: 32px; height: 32px; fill: #fff; }
-        .title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
-        .subtitle { font-size: 14px; color: #888; margin-bottom: 20px; }
-        .wxid-box {
-            background: #f7fdf9;
-            border: 2px dashed #c8e6c9;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 8px;
-            transition: all 0.3s;
-        }
-        .wxid-box.copied-flash {
-            border-color: #25d366;
-            background: #e8fcef;
-            animation: pulseBorder 0.5s ease;
-        }
-        @keyframes pulseBorder {
-            0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.4); }
-            50% { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
-        }
-        .wxid-label { font-size: 12px; color: #999; letter-spacing: 2px; margin-bottom: 4px; }
-        .wxid { font-size: 28px; font-weight: 700; color: #2c5f2d; }
-        .copy-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: #25d366; color: #fff; border: none;
-            padding: 14px 36px; border-radius: 30px;
-            font-size: 17px; font-weight: 600; cursor: pointer;
-            letter-spacing: 0.5px; transition: all 0.25s;
-            box-shadow: 0 4px 16px rgba(37,211,102,0.3);
-            margin: 10px 0 18px; position: relative; overflow: hidden;
-        }
-        .copy-btn:hover { background: #1ebe5c; transform: translateY(-1px); }
-        .copy-btn:active { transform: scale(0.96); }
-        .copy-btn .ripple {
-            position: absolute; border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            transform: scale(0);
-            animation: rippleAnim 0.6s ease-out forwards;
-            pointer-events: none;
-        }
-        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
-        .gif-wrapper { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-top: 4px; }
-        .gif { max-width: 100%; width: 320px; display: block; margin: 0 auto; }
-        .toast {
-            position: fixed; top: 24px; left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            background: #333; color: #fff; padding: 12px 24px;
-            border-radius: 30px; font-size: 15px; font-weight: 500;
-            z-index: 999; transition: transform 0.35s ease;
-            pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.success { background: #25d366; }
+        :root { --green:#25d366; --dark-green:#2c5f2d; --bg:#f0f2f5; --card-bg:#fff; --text:#1a1a1a; --shadow:0 4px 20px rgba(0,0,0,0.08); }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:linear-gradient(160deg,#e8f5e9 0%,#f0f2f5 30%,#fff 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; -webkit-tap-highlight-color:transparent; user-select:none; }
+        .card { background:var(--card-bg); border-radius:20px; padding:36px 28px 28px; max-width:400px; width:100%; box-shadow:var(--shadow); text-align:center; position:relative; overflow:hidden; }
+        .card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,#25d366,#1ebe5c,#25d366); border-radius:20px 20px 0 0; }
+        .icon-wechat { width:56px; height:56px; background:#25d366; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 4px 14px rgba(37,211,102,0.35); }
+        .icon-wechat svg { width:32px; height:32px; fill:#fff; }
+        .title { font-size:22px; font-weight:700; color:#1a1a1a; margin-bottom:6px; }
+        .subtitle { font-size:14px; color:#888; margin-bottom:20px; }
+        .wxid-box { background:#f7fdf9; border:2px dashed #c8e6c9; border-radius:12px; padding:16px; margin-bottom:8px; transition:all 0.3s; }
+        .wxid-box.copied-flash { border-color:#25d366; background:#e8fcef; animation:pulseBorder 0.5s ease; }
+        @keyframes pulseBorder { 0%,100%{ box-shadow:0 0 0 0 rgba(37,211,102,0.4); } 50%{ box-shadow:0 0 0 14px rgba(37,211,102,0); } }
+        .wxid-label { font-size:12px; color:#999; letter-spacing:2px; margin-bottom:4px; }
+        .wxid { font-size:28px; font-weight:700; color:#2c5f2d; }
+        .copy-btn { display:inline-flex; align-items:center; gap:8px; background:#25d366; color:#fff; border:none; padding:14px 36px; border-radius:30px; font-size:17px; font-weight:600; cursor:pointer; letter-spacing:0.5px; transition:all 0.25s; box-shadow:0 4px 16px rgba(37,211,102,0.3); margin:10px 0 18px; position:relative; overflow:hidden; }
+        .copy-btn:hover { background:#1ebe5c; transform:translateY(-1px); }
+        .copy-btn:active { transform:scale(0.96); }
+        .gif-wrapper { border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08); margin-top:4px; }
+        .gif { max-width:100%; width:320px; display:block; margin:0 auto; }
+        .toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-120px); background:#333; color:#fff; padding:12px 24px; border-radius:30px; font-size:15px; font-weight:500; z-index:999; transition:transform 0.35s ease; pointer-events:none; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .toast.success { background:#25d366; }
     </style>
 </head>
 <body>
@@ -113,155 +34,124 @@
 
     <div class="card">
         <div class="icon-wechat">
-            <svg viewBox="0 0 24 24">
-                <path d="M8.69 11.66a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm4.62 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm-6.07 4.73c-3.96 0-7.18-3.22-7.18-7.18S3.28 2 7.24 2c3.7 0 6.75 2.8 7.1 6.37a7.4 7.4 0 0 0-1.67-.17c-4.08 0-7.4 3.3-7.4 7.38 0 1.5.45 2.9 1.22 4.06-.42-.03-.84-.08-1.25-.18v1.74c-2.12-.77-4.07-1.93-4.07-1.93s.03.03-.08-.03c-.9-.52-1.66-1.18-2.26-1.95a7.2 7.2 0 0 1-1.07-3.74c0-.56.06-1.1.19-1.62.38.1.78.17 1.19.2zm11.16 2.05c-2.2 0-4-1.78-4-3.98s1.8-3.98 4-3.98 4 1.78 4 3.98-1.8 3.98-4 3.98zm-1.5-3.18a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6zm3 0a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6z"/>
-            </svg>
+            <svg viewBox="0 0 24 24"><path d="M8.69 11.66a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm4.62 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm-6.07 4.73c-3.96 0-7.18-3.22-7.18-7.18S3.28 2 7.24 2c3.7 0 6.75 2.8 7.1 6.37a7.4 7.4 0 0 0-1.67-.17c-4.08 0-7.4 3.3-7.4 7.38 0 1.5.45 2.9 1.22 4.06-.42-.03-.84-.08-1.25-.18v1.74c-2.12-.77-4.07-1.93-4.07-1.93s.03.03-.08-.03c-.9-.52-1.66-1.18-2.26-1.95a7.2 7.2 0 0 1-1.07-3.74c0-.56.06-1.1.19-1.62.38.1.78.17 1.19.2zm11.16 2.05c-2.2 0-4-1.78-4-3.98s1.8-3.98 4-3.98 4 1.78 4 3.98-1.8 3.98-4 3.98zm-1.5-3.18a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6zm3 0a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6z"/></svg>
         </div>
         <div class="title">添加微信好友</div>
         <div class="subtitle">扫码或搜索微信号添加</div>
-
         <div class="wxid-box" id="wxidBox">
             <div class="wxid-label">微信号</div>
             <div class="wxid" id="wxidText">N88385</div>
         </div>
-
         <button class="copy-btn" id="copyBtn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             点击复制微信号
         </button>
-
         <div class="gif-wrapper">
-            <img class="gif" src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF"
-                 alt="添加微信教程" loading="eager"
-                 onerror="this.style.display='none';document.getElementById('gifFallback').style.display='block';">
-            <div id="gifFallback" style="display:none;padding:20px;color:#999;font-size:13px;">
-                📱 请打开微信 → 搜索 <strong>N88385</strong> → 添加好友
-            </div>
+            <img class="gif" src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF" alt="教程" onerror="this.style.display='none';document.getElementById('fallback').style.display='block';">
+            <div id="fallback" style="display:none;padding:20px;color:#999;font-size:13px;">📱 请打开微信 → 搜索 <strong>N88385</strong> → 添加好友</div>
         </div>
     </div>
 
-    <script>
-        (function() {
-            const copyBtn = document.getElementById('copyBtn');
-            const wxidBox = document.getElementById('wxidBox');
-            const wxidText = document.getElementById('wxidText');
-            const toast = document.getElementById('toast');
-            const WX_ID = 'N88385';
-            let toastTimer = null;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-            // ================== 我自己的远程计数器（国内可用，无需注册） ==================
-            const API_BASE = 'https://n88385-counter.deno.dev';  // 我自己部署的计数服务
-            function getDateKey() {
-                const d = new Date();
-                return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        // 你的 Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtopFoYuxVxW5nkvX5wML4ckk25Pgqzws",
+            authDomain: "aayy-636ae.firebaseapp.com",
+            projectId: "aayy-636ae",
+            storageBucket: "aayy-636ae.firebasestorage.app",
+            messagingSenderId: "1042761346693",
+            appId: "1:1042761346693:web:48505c61668587c4dcc3ec"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function getDateKey() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+
+        async function incrementCount() {
+            const dateKey = getDateKey();
+            const docRef = doc(db, "daily_counts", dateKey);
+            try {
+                await updateDoc(docRef, { count: increment(1) });
+                console.log("✅ 远程计数 +1");
+            } catch (e) {
+                await setDoc(docRef, { count: 1 });
+                console.log("✅ 远程计数已创建并设为1");
             }
+        }
 
-            // 上报一次复制
-            function reportCopy() {
-                const key = getDateKey();
-                fetch(API_BASE + '/hit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key: key })
-                }).then(res => res.json()).then(data => {
-                    console.log('✅ 远程计数已更新:', data.count);
-                }).catch(err => {
-                    console.warn('⚠️ 远程上报失败，降级到本地');
-                    const localKey = 'local_' + key;
-                    localStorage.setItem(localKey, (parseInt(localStorage.getItem(localKey)||'0') + 1));
+        async function getRemoteCount() {
+            const dateKey = getDateKey();
+            const docRef = doc(db, "daily_counts", dateKey);
+            const snap = await getDoc(docRef);
+            return snap.exists() ? snap.data().count : 0;
+        }
+
+        const WX_ID = 'N88385';
+        const copyBtn = document.getElementById('copyBtn');
+        const wxidBox = document.getElementById('wxidBox');
+        const wxidText = document.getElementById('wxidText');
+        const toast = document.getElementById('toast');
+        let toastTimer;
+
+        function showToast(msg, type='') {
+            if(toastTimer) clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function flashBox() {
+            wxidBox.classList.add('copied-flash');
+            setTimeout(() => wxidBox.classList.remove('copied-flash'), 600);
+        }
+
+        function handleCopy() {
+            flashBox();
+            showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
+            incrementCount();
+        }
+
+        copyBtn.addEventListener('click', () => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(WX_ID).then(handleCopy).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = WX_ID; ta.style.position='fixed'; ta.style.left='-9999px';
+                    document.body.appendChild(ta); ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    handleCopy();
                 });
             }
+        });
 
-            // 获取远程今日次数
-            function getRemoteCount(callback) {
-                const key = getDateKey();
-                fetch(API_BASE + '/count?key=' + key)
-                    .then(res => res.json())
-                    .then(data => {
-                        callback(data.count || 0);
-                    })
-                    .catch(() => {
-                        const localKey = 'local_' + key;
-                        callback(parseInt(localStorage.getItem(localKey)||'0'));
-                    });
-            }
+        wxidText.addEventListener('copy', (e) => {
+            e.preventDefault();
+            if(e.clipboardData) e.clipboardData.setData('text/plain', WX_ID);
+            handleCopy();
+        });
 
-            // ================== 界面交互 ==================
-            function showToast(msg, type='') {
-                if(toastTimer) clearTimeout(toastTimer);
-                toast.textContent = msg;
-                toast.className = 'toast ' + type + ' show';
-                toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
-            }
-
-            function createRipple(e, btn) {
-                const ripple = document.createElement('span');
-                ripple.className = 'ripple';
-                const rect = btn.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-                ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
-                btn.appendChild(ripple);
-                ripple.addEventListener('animationend', () => ripple.remove());
-            }
-
-            function flashWxidBox() {
-                wxidBox.classList.add('copied-flash');
-                setTimeout(() => wxidBox.classList.remove('copied-flash'), 600);
-            }
-
-            function handleCopySuccess() {
-                flashWxidBox();
-                showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
-                reportCopy();
-            }
-
-            copyBtn.addEventListener('click', function(e) {
-                createRipple(e, copyBtn);
-                if(navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(WX_ID).then(handleCopySuccess).catch(() => {
-                        const ta = document.createElement('textarea');
-                        ta.value = WX_ID; ta.style.position='fixed'; ta.left='-9999px';
-                        document.body.appendChild(ta); ta.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        handleCopySuccess();
-                    });
+        let clickCount = 0, clickTimer = null;
+        document.addEventListener('click', async (e) => {
+            if(e.target.closest('#copyBtn') || e.target.closest('#toast')) return;
+            clickCount++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(async () => {
+                if(clickCount >= 3) {
+                    const count = await getRemoteCount();
+                    alert('📊 今日总复制次数：' + count + ' 次（手机+电脑实时同步）');
                 }
-            });
+                clickCount = 0;
+            }, 1000);
+        });
 
-            wxidText.addEventListener('copy', function(e) {
-                e.preventDefault();
-                if(e.clipboardData) e.clipboardData.setData('text/plain', WX_ID);
-                handleCopySuccess();
-            });
-
-            wxidText.addEventListener('mouseup', function() {
-                if(window.getSelection()?.toString().trim().length) wxidBox.style.cursor = 'copy';
-            });
-
-            // 开发者隐藏功能：连点3次查看同步后的总次数
-            let clickCount = 0, clickTimer = null;
-            document.addEventListener('click', function(e) {
-                if(e.target.closest('#copyBtn') || e.target.closest('#toast')) return;
-                clickCount++;
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => {
-                    if(clickCount >= 3) {
-                        getRemoteCount(function(count) {
-                            alert('📊 今日总复制次数：' + count + ' 次（手机+电脑）');
-                        });
-                    }
-                    clickCount = 0;
-                }, 1000);
-            });
-
-            console.log('✅ 已连接远程计数服务 (deno.dev)');
-        })();
+        console.log('✅ Firebase 已连接，手机与电脑数据实时同步');
     </script>
 </body>
 </html>
