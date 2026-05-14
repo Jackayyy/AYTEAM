@@ -1,85 +1,439 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>添加微信好友</title>
-<style>
-body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-ui;}
-.box{padding:30px 20px;}
-.wxid{font-size:24px;color:#2c5f2d;margin:20px 0;}
-.tip{font-size:18px;color:#2c5f2d;margin-bottom:20px;}
-.copy-btn{background:#25d366;color:#fff;border:none;padding:15px 40px;border-radius:8px;font-size:20px;cursor:pointer;}
-.gif{max-width:100%;width:320px;margin-top:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>添加微信好友</title>
+    <style>
+        :root {
+            --green: #25d366;
+            --dark-green: #2c5f2d;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(160deg, #e8f5e9 0%, #f0f2f5 30%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 36px 28px 28px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #25d366, #1ebe5c, #25d366);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .icon-wechat {
+            width: 56px;
+            height: 56px;
+            background: #25d366;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        }
+
+        .icon-wechat svg {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .wxid-box {
+            background: #f7fdf9;
+            border: 2px dashed #c8e6c9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .wxid-box.copied-flash {
+            border-color: #25d366;
+            background: #e8fcef;
+            animation: pulseBorder 0.5s ease;
+        }
+
+        @keyframes pulseBorder {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);
+            }
+        }
+
+        .wxid-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .wxid {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c5f2d;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #25d366;
+            color: #fff;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+            margin: 10px 0 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .copy-btn:hover {
+            background: #1ebe5c;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(37, 211, 102, 0.4);
+        }
+        .copy-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
+            transition: all 0.1s;
+        }
+
+        .copy-btn .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: rippleAnim 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .gif-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            line-height: 0;
+            margin-top: 4px;
+        }
+        .gif {
+            max-width: 100%;
+            width: 320px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            z-index: 999;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            background: #25d366;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-<div class="box">
-    <div class="wxid">微信号:N88385</div>
-    <div class="tip">请打开微信搜索并添加好友</div>
-    <button class="copy-btn" onclick="copyWx()">点击复制</button>
-    <br>
-    <img class="gif" src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF">
-</div>
 
-<script>
-// 获取今日日期
-function getTodayStr() {
-  let d = new Date();
-  return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
-}
-const today = getTodayStr();
+    <div class="toast" id="toast"></div>
 
-// 隔天自动清零统计
-if(localStorage.getItem('td') !== today){
-    localStorage.setItem('td', today);
-    localStorage.setItem('cnt', 0);
-    localStorage.setItem('devs', '');
-}
+    <div class="card">
+        <div class="icon-wechat">
+            <svg viewBox="0 0 24 24">
+                <path d="M8.69 11.66a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm4.62 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm-6.07 4.73c-3.96 0-7.18-3.22-7.18-7.18S3.28 2 7.24 2c3.7 0 6.75 2.8 7.1 6.37a7.4 7.4 0 0 0-1.67-.17c-4.08 0-7.4 3.3-7.4 7.38 0 1.5.45 2.9 1.22 4.06-.42-.03-.84-.08-1.25-.18v1.74c-2.12-.77-4.07-1.93-4.07-1.93s.03.03-.08-.03c-.9-.52-1.66-1.18-2.26-1.95a7.2 7.2 0 0 1-1.07-3.74c0-.56.06-1.1.19-1.62.38.1.78.17 1.19.2zm11.16 2.05c-2.2 0-4-1.78-4-3.98s1.8-3.98 4-3.98 4 1.78 4 3.98-1.8 3.98-4 3.98zm-1.5-3.18a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6zm3 0a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6z"/>
+            </svg>
+        </div>
 
-// 生成设备唯一标识
-function getDevId(){
-    let id = localStorage.getItem('did');
-    if(!id){
-        id = Math.random().toString(36).slice(2);
-        localStorage.setItem('did', id);
-    }
-    return id;
-}
+        <div class="title">添加微信好友</div>
+        <div class="subtitle">扫码或搜索微信号添加</div>
 
-let did = getDevId();
-let list = (localStorage.getItem('devs') || '').split(',');
+        <div class="wxid-box" id="wxidBox">
+            <div class="wxid-label">微信号</div>
+            <div class="wxid" id="wxidText">N88385</div>
+        </div>
 
-// 同设备当天只计数一次
-if(!list.includes(did)){
-    let num = parseInt(localStorage.getItem('cnt')) || 0;
-    num++;
-    localStorage.setItem('cnt', num);
-    list.push(did);
-    localStorage.setItem('devs', list.join(','));
-}
+        <button class="copy-btn" id="copyBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            点击复制微信号
+        </button>
 
-// 连续点击3次弹出人数
-let clickCount = 0;
-let clickTimer = null;
-document.addEventListener('click', function(){
-    clickCount++;
-    clearTimeout(clickTimer);
-    // 1秒内点够3次就弹窗
-    clickTimer = setTimeout(()=>{
-        if(clickCount >= 3){
-            let n = localStorage.getItem('cnt');
-            alert("📊 今日来访人数：" + n + " 人");
-        }
-        clickCount = 0;
-    }, 1000);
-});
+        <div class="gif-wrapper">
+            <img class="gif"
+            src="https://raw.githubusercontent.com/Jackayyy/AYTEAM/41813440d12dc125c14dd6c3abeda9f8d864c8f7/wx.GIF"
+            alt="添加微信教程"
+            loading="eager"
+            onerror="this.style.display='none';document.getElementById('gifFallback').style.display='block';">
+            <div id="gifFallback" style="display:none;padding:20px;color:#999;font-size:13px;">
+                📱 请打开微信 → 搜索 <strong>N88385</strong> → 添加好友
+            </div>
+        </div>
+    </div>
 
-// 复制微信号
-function copyWx(){
-    navigator.clipboard.writeText("N88385");
-    alert("已复制！请按图中步骤添加好友");
-}
-</script>
+    <script>
+        (function() {
+            const copyBtn = document.getElementById('copyBtn');
+            const wxidBox = document.getElementById('wxidBox');
+            const wxidText = document.getElementById('wxidText');
+            const toast = document.getElementById('toast');
+
+            const WX_ID = 'N88385';
+            let toastTimer = null;
+
+            // ===== 远程计数器配置（免费，无需注册） =====
+            const COUNTER_NAMESPACE = 'wx-friend-add-n88385'; // 唯一命名空间，避免与他人冲突
+            // 获取今日日期 YYYY-MM-DD (补零格式，作为key的一部分)
+            function getDateKey() {
+                const d = new Date();
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+            // 构建API地址：hit 用于增加，get 用于查询
+            const BASE_URL = 'https://api.countapi.xyz';
+
+            // 远程增加一次计数（异步，不影响用户体验）
+            function remoteHit() {
+                const key = getDateKey();
+                const url = `${BASE_URL}/hit/${COUNTER_NAMESPACE}/copy-${key}`;
+                // 静默发送，忽略错误
+                fetch(url, { method: 'GET', mode: 'cors' })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('✅ 远程计数已更新，当前值:', data.value);
+                    })
+                    .catch(err => {
+                        console.warn('⚠️ 远程计数上报失败（网络问题），本地仍正常记录');
+                        // 降级：使用localStorage保证本设备计数不丢失
+                        localFallbackHit();
+                    });
+            }
+
+            // 本地备用计数（当远程API不可用时）
+            function localFallbackHit() {
+                const today = getDateKey();
+                const count = parseInt(localStorage.getItem('local_copy_' + today) || '0') + 1;
+                localStorage.setItem('local_copy_' + today, count);
+            }
+
+            // 获取远程今日计数
+            function getRemoteCount(callback) {
+                const key = getDateKey();
+                const url = `${BASE_URL}/get/${COUNTER_NAMESPACE}/copy-${key}`;
+                fetch(url, { method: 'GET', mode: 'cors' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && typeof data.value === 'number') {
+                            callback(data.value);
+                        } else {
+                            throw new Error('无效数据');
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('⚠️ 获取远程计数失败，使用本地数据');
+                        const today = getDateKey();
+                        const local = parseInt(localStorage.getItem('local_copy_' + today) || '0');
+                        callback(local);
+                    });
+            }
+
+            // ===== Toast提示 =====
+            function showToast(msg, type = '') {
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.textContent = msg;
+                toast.className = 'toast ' + type + ' show';
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            }
+
+            // 按钮波纹效果
+            function createRipple(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // 微信号框闪烁
+            function flashWxidBox() {
+                wxidBox.classList.add('copied-flash');
+                setTimeout(() => wxidBox.classList.remove('copied-flash'), 600);
+            }
+
+            // ===== 复制功能 =====
+            function handleCopySuccess() {
+                flashWxidBox();
+                showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
+                // 远程计数 +1
+                remoteHit();
+            }
+
+            copyBtn.addEventListener('click', function(e) {
+                createRipple(e, copyBtn);
+                const doCopy = () => {
+                    navigator.clipboard.writeText(WX_ID).then(() => {
+                        handleCopySuccess();
+                    }).catch(() => {
+                        fallbackCopy();
+                    });
+                };
+                const fallbackCopy = () => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = WX_ID;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    textarea.style.top = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    try {
+                        const success = document.execCommand('copy');
+                        if (success) {
+                            handleCopySuccess();
+                        } else {
+                            showToast('⚠️ 复制失败，请手动记下微信号');
+                        }
+                    } catch (err) {
+                        showToast('⚠️ 复制失败，请手动记下微信号');
+                    }
+                    document.body.removeChild(textarea);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    doCopy();
+                } else {
+                    fallbackCopy();
+                }
+            });
+
+            // 选中微信号文本时Ctrl+C复制
+            wxidText.addEventListener('copy', function(e) {
+                e.preventDefault();
+                if (e.clipboardData) {
+                    e.clipboardData.setData('text/plain', WX_ID);
+                }
+                handleCopySuccess();
+            });
+
+            wxidText.addEventListener('mouseup', function() {
+                const selection = window.getSelection();
+                if (selection && selection.toString().trim().length > 0) {
+                    wxidBox.style.cursor = 'copy';
+                }
+            });
+
+            // ===== 开发者功能：连点3次查看今日复制总数（同步远程数据） =====
+            let devClickCount = 0;
+            let devClickTimer = null;
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('#copyBtn')) return;
+                if (e.target.closest('#toast')) return;
+
+                devClickCount++;
+                clearTimeout(devClickTimer);
+                devClickTimer = setTimeout(() => {
+                    if (devClickCount >= 3) {
+                        // 从远程获取当日计数并弹出
+                        getRemoteCount(function(count) {
+                            alert('📊 今日总复制次数：' + count + ' 次（跨设备同步）');
+                        });
+                    }
+                    devClickCount = 0;
+                }, 1000);
+            });
+
+            console.log('✅ 微信添加好友页面已就绪（远程计数已启用，连点3次查看今日总数）');
+        })();
+    </script>
 </body>
 </html>
