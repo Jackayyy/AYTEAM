@@ -152,80 +152,46 @@
             const WX_ID = 'N88385';
             let toastTimer = null;
 
-            // ========== 远程计数器配置（jsonbox.io 免费、国内可用、跨设备同步） ==========
-            const BOX_ID = 'box_n88385_wx_copy';          // 唯一存储箱ID，所有设备共用
-            const BASE_URL = 'https://jsonbox.io/' + BOX_ID;
-
-            // 获取当日日期作为存储键（例如：2026-05-14）
+            // ================== 我自己的远程计数器（国内可用，无需注册） ==================
+            const API_BASE = 'https://n88385-counter.deno.dev';  // 我自己部署的计数服务
             function getDateKey() {
                 const d = new Date();
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${y}-${m}-${day}`;
+                return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
             }
 
-            // 上报复制事件：读取远程当日计数 → +1 → 写回
+            // 上报一次复制
             function reportCopy() {
-                const dateKey = getDateKey();
-                const recordId = dateKey;   // 当日数据条目ID
-
-                // 1. 先查询当前计数
-                fetch(`${BASE_URL}/${recordId}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error('查询失败');
-                        return res.json();
-                    })
-                    .then(data => {
-                        // 如果存在记录，取 value；否则视为 0
-                        const current = (data && typeof data.value === 'number') ? data.value : 0;
-                        const newCount = current + 1;
-                        // 2. 写回更新后的计数
-                        return fetch(`${BASE_URL}/${recordId}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ value: newCount })
-                        });
-                    })
-                    .then(res => {
-                        if (res.ok) {
-                            console.log('✅ 远程计数已更新');
-                        } else {
-                            throw new Error('写入失败');
-                        }
-                    })
-                    .catch(() => {
-                        // 远程失败时，降级到本地存储
-                        const localKey = 'local_copy_' + dateKey;
-                        const count = parseInt(localStorage.getItem(localKey) || '0') + 1;
-                        localStorage.setItem(localKey, count);
-                        console.log('📦 本地计数已更新:', count);
-                    });
+                const key = getDateKey();
+                fetch(API_BASE + '/hit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: key })
+                }).then(res => res.json()).then(data => {
+                    console.log('✅ 远程计数已更新:', data.count);
+                }).catch(err => {
+                    console.warn('⚠️ 远程上报失败，降级到本地');
+                    const localKey = 'local_' + key;
+                    localStorage.setItem(localKey, (parseInt(localStorage.getItem(localKey)||'0') + 1));
+                });
             }
 
-            // 获取远程今日总次数
+            // 获取远程今日次数
             function getRemoteCount(callback) {
-                const dateKey = getDateKey();
-                fetch(`${BASE_URL}/${dateKey}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error('查询失败');
-                        return res.json();
-                    })
+                const key = getDateKey();
+                fetch(API_BASE + '/count?key=' + key)
+                    .then(res => res.json())
                     .then(data => {
-                        const count = (data && typeof data.value === 'number') ? data.value : 0;
-                        callback(count);
+                        callback(data.count || 0);
                     })
                     .catch(() => {
-                        // 降级到本地
-                        const localKey = 'local_copy_' + dateKey;
-                        const local = parseInt(localStorage.getItem(localKey) || '0');
-                        callback(local);
+                        const localKey = 'local_' + key;
+                        callback(parseInt(localStorage.getItem(localKey)||'0'));
                     });
             }
 
-            // ========== 界面交互 ==========
-            function showToast(msg, type = '') {
-                if (toastTimer) clearTimeout(toastTimer);
+            // ================== 界面交互 ==================
+            function showToast(msg, type='') {
+                if(toastTimer) clearTimeout(toastTimer);
                 toast.textContent = msg;
                 toast.className = 'toast ' + type + ' show';
                 toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
@@ -251,77 +217,50 @@
             function handleCopySuccess() {
                 flashWxidBox();
                 showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
-                reportCopy();  // 上报复制事件
+                reportCopy();
             }
 
-            // 按钮点击复制
             copyBtn.addEventListener('click', function(e) {
                 createRipple(e, copyBtn);
-                
-                const doCopy = () => {
-                    navigator.clipboard.writeText(WX_ID)
-                        .then(handleCopySuccess)
-                        .catch(fallbackCopy);
-                };
-                
-                const fallbackCopy = () => {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = WX_ID;
-                    textarea.style.position = 'fixed';
-                    textarea.style.left = '-9999px';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    try {
+                if(navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(WX_ID).then(handleCopySuccess).catch(() => {
+                        const ta = document.createElement('textarea');
+                        ta.value = WX_ID; ta.style.position='fixed'; ta.left='-9999px';
+                        document.body.appendChild(ta); ta.select();
                         document.execCommand('copy');
+                        document.body.removeChild(ta);
                         handleCopySuccess();
-                    } catch (err) {
-                        showToast('⚠️ 复制失败，请手动记下微信号');
-                    }
-                    document.body.removeChild(textarea);
-                };
-
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    doCopy();
-                } else {
-                    fallbackCopy();
+                    });
                 }
             });
 
-            // 选中文本 Ctrl+C 复制
             wxidText.addEventListener('copy', function(e) {
                 e.preventDefault();
-                if (e.clipboardData) {
-                    e.clipboardData.setData('text/plain', WX_ID);
-                }
+                if(e.clipboardData) e.clipboardData.setData('text/plain', WX_ID);
                 handleCopySuccess();
             });
 
             wxidText.addEventListener('mouseup', function() {
-                if (window.getSelection()?.toString().trim().length) {
-                    wxidBox.style.cursor = 'copy';
-                }
+                if(window.getSelection()?.toString().trim().length) wxidBox.style.cursor = 'copy';
             });
 
-            // ========== 开发者隐藏功能：连点空白处3次查看今日总数 ==========
-            let clickCount = 0;
-            let clickTimer = null;
+            // 开发者隐藏功能：连点3次查看同步后的总次数
+            let clickCount = 0, clickTimer = null;
             document.addEventListener('click', function(e) {
-                if (e.target.closest('#copyBtn') || e.target.closest('#toast')) return;
-
+                if(e.target.closest('#copyBtn') || e.target.closest('#toast')) return;
                 clickCount++;
                 clearTimeout(clickTimer);
                 clickTimer = setTimeout(() => {
-                    if (clickCount >= 3) {
+                    if(clickCount >= 3) {
                         getRemoteCount(function(count) {
-                            alert('📊 今日总复制次数：' + count + ' 次（跨设备同步）');
+                            alert('📊 今日总复制次数：' + count + ' 次（手机+电脑）');
                         });
                     }
                     clickCount = 0;
                 }, 1000);
             });
 
-            console.log('✅ 微信添加好友页面已就绪（远程存储：jsonbox.io）');
-            console.log('   手机与电脑数据实时同步，连点3次空白处查看今日总数');
+            console.log('✅ 已连接远程计数服务 (deno.dev)');
         })();
     </script>
 </body>
