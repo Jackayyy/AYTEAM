@@ -264,9 +264,9 @@
             const WX_ID = 'N88385';
             let toastTimer = null;
 
-            // ===== 远程计数器配置（免费，无需注册） =====
-            const COUNTER_NAMESPACE = 'wx-friend-add-n88385'; // 唯一命名空间，避免与他人冲突
-            // 获取今日日期 YYYY-MM-DD (补零格式，作为key的一部分)
+            // ===== 远程计数器配置 =====
+            const COUNTER_NAMESPACE = 'wx-friend-add-n88385';
+            
             function getDateKey() {
                 const d = new Date();
                 const y = d.getFullYear();
@@ -274,52 +274,92 @@
                 const day = String(d.getDate()).padStart(2, '0');
                 return `${y}-${m}-${day}`;
             }
-            // 构建API地址：hit 用于增加，get 用于查询
-            const BASE_URL = 'https://api.countapi.xyz';
 
-            // 远程增加一次计数（异步，不影响用户体验）
-            function remoteHit() {
+            // 方案1：fetch方式（现代浏览器）
+            function remoteHitWithFetch() {
                 const key = getDateKey();
-                const url = `${BASE_URL}/hit/${COUNTER_NAMESPACE}/copy-${key}`;
-                // 静默发送，忽略错误
-                fetch(url, { method: 'GET', mode: 'cors' })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log('✅ 远程计数已更新，当前值:', data.value);
-                    })
-                    .catch(err => {
-                        console.warn('⚠️ 远程计数上报失败（网络问题），本地仍正常记录');
-                        // 降级：使用localStorage保证本设备计数不丢失
-                        localFallbackHit();
-                    });
+                const url = `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/copy-${key}`;
+                
+                fetch(url, { 
+                    method: 'GET',
+                    // 不设置mode，让浏览器自动处理
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('✅ 远程计数已更新 (fetch):', data.value);
+                })
+                .catch(err => {
+                    console.warn('⚠️ fetch方式失败，降级为img方式:', err.message);
+                    remoteHitWithImage();
+                });
             }
 
-            // 本地备用计数（当远程API不可用时）
+            // 方案2：img图片方式（兼容所有浏览器，包括微信内置浏览器）
+            function remoteHitWithImage() {
+                const key = getDateKey();
+                const url = `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/copy-${key}`;
+                
+                const img = new Image();
+                img.src = url;
+                
+                img.onload = function() {
+                    console.log('✅ 远程计数已更新 (img):', 'success');
+                };
+                img.onerror = function() {
+                    console.warn('⚠️ img方式也失败了，使用本地备用计数');
+                    localFallbackHit();
+                };
+                
+                // 5秒超时清理
+                setTimeout(() => {
+                    if (img && !img.complete) {
+                        img.src = '';
+                        console.warn('⚠️ img请求超时，使用本地备用计数');
+                        localFallbackHit();
+                    }
+                }, 5000);
+            }
+
+            // 本地备用计数
             function localFallbackHit() {
                 const today = getDateKey();
                 const count = parseInt(localStorage.getItem('local_copy_' + today) || '0') + 1;
                 localStorage.setItem('local_copy_' + today, count);
+                console.log('📦 本地计数已更新:', count);
             }
 
-            // 获取远程今日计数
+            // 主上报函数：优先fetch，失败自动降级img
+            function reportCopy() {
+                // 优先尝试fetch
+                remoteHitWithFetch();
+            }
+
+            // 获取远程计数
             function getRemoteCount(callback) {
                 const key = getDateKey();
-                const url = `${BASE_URL}/get/${COUNTER_NAMESPACE}/copy-${key}`;
-                fetch(url, { method: 'GET', mode: 'cors' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && typeof data.value === 'number') {
-                            callback(data.value);
-                        } else {
-                            throw new Error('无效数据');
-                        }
-                    })
-                    .catch(err => {
-                        console.warn('⚠️ 获取远程计数失败，使用本地数据');
-                        const today = getDateKey();
-                        const local = parseInt(localStorage.getItem('local_copy_' + today) || '0');
-                        callback(local);
-                    });
+                const url = `https://api.countapi.xyz/get/${COUNTER_NAMESPACE}/copy-${key}`;
+                
+                fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && typeof data.value === 'number') {
+                        callback(data.value);
+                    } else {
+                        throw new Error('无效数据');
+                    }
+                })
+                .catch(err => {
+                    console.warn('⚠️ 获取远程计数失败，使用本地数据');
+                    const today = getDateKey();
+                    const local = parseInt(localStorage.getItem('local_copy_' + today) || '0');
+                    callback(local);
+                });
             }
 
             // ===== Toast提示 =====
@@ -355,8 +395,8 @@
             function handleCopySuccess() {
                 flashWxidBox();
                 showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
-                // 远程计数 +1
-                remoteHit();
+                // 上报复制事件
+                reportCopy();
             }
 
             copyBtn.addEventListener('click', function(e) {
@@ -412,7 +452,7 @@
                 }
             });
 
-            // ===== 开发者功能：连点3次查看今日复制总数（同步远程数据） =====
+            // ===== 开发者功能：连点3次查看今日复制总数 =====
             let devClickCount = 0;
             let devClickTimer = null;
             document.addEventListener('click', function(e) {
@@ -423,7 +463,6 @@
                 clearTimeout(devClickTimer);
                 devClickTimer = setTimeout(() => {
                     if (devClickCount >= 3) {
-                        // 从远程获取当日计数并弹出
                         getRemoteCount(function(count) {
                             alert('📊 今日总复制次数：' + count + ' 次（跨设备同步）');
                         });
@@ -432,7 +471,11 @@
                 }, 1000);
             });
 
-            console.log('✅ 微信添加好友页面已就绪（远程计数已启用，连点3次查看今日总数）');
+            // ===== 初始化测试 =====
+            console.log('✅ 微信添加好友页面已就绪');
+            console.log('   📱 支持fetch + img降级上报，兼容所有设备');
+            console.log('   🖱️ 连点空白处3次查看跨设备汇总数据');
+            console.log('   📅 今日计数器key:', getDateKey());
         })();
     </script>
 </body>
