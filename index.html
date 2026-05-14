@@ -10,13 +10,7 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
 .wxid{font-size:24px;color:#2c5f2d;margin:20px 0;}
 .tip{font-size:18px;color:#2c5f2d;margin-bottom:20px;}
 .copy-btn{background:#25d366;color:#fff;border:none;padding:15px 40px;border-radius:8px;font-size:20px;cursor:pointer;}
-.gif{
-    max-width:100%;
-    width:320px;
-    margin-top:20px;
-    border-radius:8px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.1);
-}
+.gif{max-width:100%;width:320px;margin-top:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
 </style>
 </head>
 <body>
@@ -29,74 +23,59 @@ body{margin:0;padding:0;background:#f5f5f5;text-align:center;font-family:system-
 </div>
 
 <script>
-// 今日日期
+// 获取今日日期
 function getTodayStr() {
-  const d = new Date();
+  let d = new Date();
   return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
 }
 const today = getTodayStr();
 
-// 隔天重置所有统计
-if(localStorage.getItem('todayDate') !== today){
-    localStorage.setItem('todayDate', today);
-    localStorage.setItem('visitCount', 0);
-    localStorage.setItem('deviceList', '');
+// 隔天自动清零统计
+if(localStorage.getItem('td') !== today){
+    localStorage.setItem('td', today);
+    localStorage.setItem('cnt', 0);
+    localStorage.setItem('devs', '');
 }
 
-// 生成随机设备标识
-function getDeviceID(){
-    let did = localStorage.getItem('did');
-    if(!did){
-        did = Math.random().toString(36).substr(2,10);
-        localStorage.setItem('did', did);
+// 生成设备唯一标识
+function getDevId(){
+    let id = localStorage.getItem('did');
+    if(!id){
+        id = Math.random().toString(36).slice(2);
+        localStorage.setItem('did', id);
     }
-    return did;
+    return id;
 }
 
-const did = getDeviceID();
-let list = localStorage.getItem('deviceList') || '';
-let arr = list ? list.split(',') : [];
+let did = getDevId();
+let list = (localStorage.getItem('devs') || '').split(',');
 
-// 今天没记录过才计数
-if(!arr.includes(did)){
-    let num = parseInt(localStorage.getItem('visitCount')) || 0;
+// 同设备当天只计数一次
+if(!list.includes(did)){
+    let num = parseInt(localStorage.getItem('cnt')) || 0;
     num++;
-    localStorage.setItem('visitCount', num);
-    arr.push(did);
-    localStorage.setItem('deviceList', arr.join(','));
+    localStorage.setItem('cnt', num);
+    list.push(did);
+    localStorage.setItem('devs', list.join(','));
 }
 
-// ========== 长按查看人数 修复版 ==========
-let pressTimer = null;
-const LONG_TIME = 3000;
-
-// 只在页面空白处长按生效
-document.body.addEventListener('touchstart', function(e){
-    let tar = e.target;
-    // 按按钮、图片不触发
-    if(tar.tagName === 'BUTTON' || tar.tagName === 'IMG') return;
-    pressTimer = setTimeout(()=>{
-        let n = localStorage.getItem('visitCount');
-        alert("📊 今日来访人数：" + n + " 人");
-    }, LONG_TIME);
+// 连续点击3次弹出人数
+let clickCount = 0;
+let clickTimer = null;
+document.addEventListener('click', function(){
+    clickCount++;
+    clearTimeout(clickTimer);
+    // 1秒内点够3次就弹窗
+    clickTimer = setTimeout(()=>{
+        if(clickCount >= 3){
+            let n = localStorage.getItem('cnt');
+            alert("📊 今日来访人数：" + n + " 人");
+        }
+        clickCount = 0;
+    }, 1000);
 });
 
-document.body.addEventListener('touchend', ()=>clearTimeout(pressTimer));
-document.body.addEventListener('touchcancel', ()=>clearTimeout(pressTimer));
-
-// 电脑鼠标长按也支持
-document.body.addEventListener('mousedown', function(e){
-    let tar = e.target;
-    if(tar.tagName === 'BUTTON' || tar.tagName === 'IMG') return;
-    pressTimer = setTimeout(()=>{
-        let n = localStorage.getItem('visitCount');
-        alert("📊 今日来访人数：" + n + " 人");
-    }, LONG_TIME);
-});
-document.body.addEventListener('mouseup', ()=>clearTimeout(pressTimer));
-document.body.addEventListener('mouseleave', ()=>clearTimeout(pressTimer));
-
-// 复制功能
+// 复制微信号
 function copyWx(){
     navigator.clipboard.writeText("N88385");
     alert("已复制！请按图中步骤添加好友");
