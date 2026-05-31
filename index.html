@@ -16,11 +16,11 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1150641976280969');
+    fbq('init', '1498332425017207');
     fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1150641976280969&ev=PageView&noscript=1"
+    src="https://www.facebook.com/tr?id=1498332425017207&ev=PageView&noscript=1"
     /></noscript>
     <!-- ====================== 像素安装完成 ====================== -->
 
@@ -65,25 +65,51 @@
     </div>
 
     <script>
-        const API_BASE = 'https://countapi.xyz';
-        function getDateKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
-        async function incrementCount() { const dateKey = getDateKey(); try { const res = await fetch(`${API_BASE}/hit/n88385-counter/copy-${dateKey}`); const data = await res.json(); } catch(e) { const key = 'local_' + dateKey; const current = parseInt(localStorage.getItem(key) || '0') + 1; localStorage.setItem(key, current); } }
-        async function getRemoteCount() { const dateKey = getDateKey(); try { const res = await fetch(`${API_BASE}/get/n88385-counter/copy-${dateKey}`); const data = await res.json(); return data.value || 0; } catch(e) { const key = 'local_' + dateKey; return parseInt(localStorage.getItem(key) || '0'); } }
         const WX_ID = 'N88385';
         const copyBtn = document.getElementById('copyBtn');
         const wxidBox = document.getElementById('wxidBox');
         const wxidText = document.getElementById('wxidText');
         const toast = document.getElementById('toast');
         let toastTimer;
-        function showToast(msg, type='') { if(toastTimer) clearTimeout(toastTimer); toast.textContent = msg; toast.className = 'toast ' + type + ' show'; toastTimer = setTimeout(() => toast.classList.remove('show'), 2000); }
-        function flashBox() { wxidBox.classList.add('copied-flash'); setTimeout(() => wxidBox.classList.remove('copied-flash'), 600); }
-        async function handleCopy() { flashBox(); showToast('✅ 已复制！请打开微信搜索添加好友', 'success'); await incrementCount(); }
-        copyBtn.addEventListener('click', () => { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(WX_ID).then(handleCopy).catch(() => { const ta = document.createElement('textarea'); ta.value = WX_ID; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); handleCopy(); }); } });
-        wxidText.addEventListener('copy', (e) => { e.preventDefault(); if(e.clipboardData) e.clipboardData.setData('text/plain', WX_ID); handleCopy(); });
-        let clickCount = 0, clickTimer = null;
-        function onBlankTap(e) { if(e.target.closest('button')) return; clickCount++; clearTimeout(clickTimer); clickTimer = setTimeout(async () => { if(clickCount >= 3) { const count = await getRemoteCount(); alert('📊 今日总复制次数：' + count + ' 次（跨设备同步）'); } clickCount = 0; }, 1500); }
-        document.addEventListener('click', onBlankTap);
-        document.addEventListener('touchstart', onBlankTap, { passive: true });
+        
+        function showToast(msg, type='') {
+            if(toastTimer) clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function flashBox() {
+            wxidBox.classList.add('copied-flash');
+            setTimeout(() => wxidBox.classList.remove('copied-flash'), 600);
+        }
+        
+        function handleCopy() {
+            flashBox();
+            showToast('✅ 已复制！请打开微信搜索添加好友', 'success');
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(WX_ID).then(handleCopy).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = WX_ID;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    handleCopy();
+                });
+            }
+        });
+        
+        wxidText.addEventListener('copy', (e) => {
+            e.preventDefault();
+            if(e.clipboardData) e.clipboardData.setData('text/plain', WX_ID);
+            handleCopy();
+        });
     </script>
 </body>
 </html>
