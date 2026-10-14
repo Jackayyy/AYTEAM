@@ -70,7 +70,7 @@
     }
 
     .card-inner {
-      padding: 30px 24px 26px;
+      padding: 26px 20px 22px;
       text-align: center;
     }
 
@@ -82,8 +82,8 @@
       background: rgba(212, 175, 55, 0.1);
       border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 999px;
-      padding: 6px 14px;
-      margin-bottom: 20px;
+      padding: 5px 14px;
+      margin-bottom: 16px;
       text-transform: uppercase;
       font-weight: 600;
     }
@@ -92,14 +92,14 @@
       font-size: 22px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #fff;
     }
 
     .subtitle {
       font-size: 13px;
       color: var(--text-sub);
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       line-height: 1.5;
     }
 
@@ -107,8 +107,8 @@
       background: #111214;
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 18px 16px;
-      margin-bottom: 20px;
+      padding: 16px 14px;
+      margin-bottom: 16px;
       position: relative;
       transition: all 0.3s ease;
     }
@@ -124,7 +124,7 @@
       letter-spacing: 1.5px;
       color: var(--gold);
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       font-weight: 600;
     }
 
@@ -159,53 +159,51 @@
       background: #b58925;
     }
 
-    /* 极简步骤条替代卡顿 GIF */
-    .steps-container {
-      margin-top: 24px;
-      background: #131416;
-      border-radius: 14px;
-      padding: 16px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      text-align: left;
-    }
-
-    .step-item {
-      display: flex;
-      align-items: center;
+    .tips {
+      margin-top: 14px;
       font-size: 13px;
-      color: #b0b0b5;
-      margin-bottom: 10px;
+      line-height: 1.6;
+      color: #999;
     }
 
-    .step-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .step-num {
-      width: 20px;
-      height: 20px;
-      background: rgba(212, 175, 55, 0.15);
-      color: var(--gold);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
+    .tips .code {
+      color: var(--gold-light);
       font-weight: 700;
-      margin-right: 10px;
-      flex-shrink: 0;
+      background: rgba(212, 175, 55, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
-    .step-highlight {
-      color: #fff;
-      font-weight: 600;
+    /* GIF 演示动图容器 */
+    .gif-wrapper {
+      margin-top: 18px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #111214;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .gif {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .fallback {
+      display: none;
+      padding: 16px;
+      font-size: 13px;
+      color: #aaa;
+      line-height: 1.6;
+      text-align: center;
     }
 
     .footer-note {
-      margin-top: 18px;
-      font-size: 12px;
+      margin-top: 16px;
+      font-size: 11px;
       color: #555;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     .toast {
@@ -252,23 +250,26 @@
         <span>📋</span> 点击一键复制微信号
       </button>
 
-      <div class="steps-container">
-        <div class="step-item">
-          <div class="step-num">1</div>
-          <div>点击上方按钮，<span class="step-highlight">自动复制微信号</span></div>
-        </div>
-        <div class="step-item">
-          <div class="step-num">2</div>
-          <div>打开微信搜索添加，备注 <span class="step-highlight">【ins】</span> 优先通过</div>
-        </div>
-        <div class="step-item">
-          <div class="step-num">3</div>
-          <div>发送想要的心仪单品图，买手急速对版找款</div>
+      <div class="tips">
+        复制后打开微信 → 搜索添加<br />
+        添加时发送暗号 <span class="code">【ins】</span> 优先通过
+      </div>
+
+      <!-- 保留原版 GIF 添加教程动图 -->
+      <div class="gif-wrapper">
+        <img
+          class="gif"
+          src="https://cdn.jsdelivr.net/gh/Jackayyy/AYTEAM@main/wx.GIF"
+          alt="添加微信教程"
+          onerror="this.style.display='none';document.getElementById('fallback').style.display='block';"
+        />
+        <div class="fallback" id="fallback">
+          📱 打开微信 → 搜索 <strong>N88385</strong> → 添加好友
         </div>
       </div>
 
       <div class="footer-note">
-        支持对版实拍 / 一对一专属服务 / 全程顺丰保价
+        支持对版验货 / 一对一买手服务 / 全程顺丰保价直发
       </div>
     </div>
   </div>
@@ -301,7 +302,7 @@
       if (hasFired) return;
       hasFired = true;
 
-      // 同时触发 Contact 和 自定义 add 事件，保证 Meta 数据模型捕捉更精准
+      // 同时回传标准事件与原自定义事件
       if (typeof fbq !== 'undefined') {
         fbq('track', 'Contact');
         fbq('trackCustom', 'add');
@@ -313,7 +314,7 @@
       showToast('✅ 微信号已复制！请打开微信搜索添加');
       firePixelEvent();
 
-      // 尝试自动呼起微信 App（部分系统支持）
+      // 尝试呼起微信
       setTimeout(() => {
         window.location.href = 'weixin://';
       }, 600);
