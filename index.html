@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>添加微信好友</title>
+  <title>AYTEAM | 顶奢买手工作室</title>
 
+  <!-- Meta Pixel Code -->
   <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -25,217 +26,208 @@
 
   <style>
     :root {
-      --green: #25d366;
-      --green-dark: #1fa855;
-      --text: #1f1f1f;
-      --subtext: #777;
-      --bg: #f3f6f8;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --bg-dark: #0f0f11;
+      --card-bg: #18191c;
+      --text-main: #f5f5f7;
+      --text-sub: #8e8e93;
+      --border-color: #2c2d30;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: linear-gradient(160deg, #edf7ef, #f3f6f8, #ffffff);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at 50% 15%, #222328 0%, var(--bg-dark) 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      color: var(--text);
+      padding: 16px;
+      color: var(--text-main);
     }
 
     .card {
       width: 100%;
-      max-width: 420px;
-      background: #fff;
-      border-radius: 22px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      max-width: 400px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.08);
       overflow: hidden;
+      position: relative;
     }
 
-    .top-bar {
-      height: 5px;
-      background: linear-gradient(90deg, #25d366, #1ebe5c, #25d366);
+    .top-gold-line {
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
 
     .card-inner {
-      padding: 24px 20px 22px;
+      padding: 30px 24px 26px;
       text-align: center;
     }
 
-    .badge {
+    .brand-tag {
       display: inline-block;
-      font-size: 13px;
-      color: #444;
-      background: #f4fbf6;
-      border: 1px solid #d9f0df;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 999px;
-      padding: 8px 14px;
-      margin-bottom: 18px;
-    }
-
-    .icon-wechat {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 14px;
-      border-radius: 50%;
-      background: var(--green);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 18px rgba(37, 211, 102, 0.28);
-    }
-
-    .icon-wechat svg {
-      width: 34px;
-      height: 34px;
-      fill: #fff;
+      padding: 6px 14px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
     .title {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 700;
-      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      color: #fff;
     }
 
     .subtitle {
-      font-size: 14px;
-      color: var(--subtext);
-      margin-bottom: 18px;
-      line-height: 1.6;
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
 
-    .wxid-box {
-      background: #f7fdf9;
-      border: 2px dashed #c8e6c9;
-      border-radius: 14px;
-      padding: 14px 12px;
-      margin-bottom: 14px;
+    .wxid-card {
+      background: #111214;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 16px;
+      margin-bottom: 20px;
+      position: relative;
       transition: all 0.3s ease;
     }
 
-    .wxid-box.copied-flash {
-      border-color: var(--green);
-      background: #eafcf0;
-      box-shadow: 0 0 0 6px rgba(37, 211, 102, 0.08);
+    .wxid-card.flash {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+      background: #1a1914;
     }
 
     .wx-label {
-      font-size: 12px;
-      color: #888;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
       margin-bottom: 6px;
+      font-weight: 600;
     }
 
-    .wxid {
-      font-size: 30px;
+    .wxid-text {
+      font-size: 32px;
       font-weight: 800;
-      color: #245c2d;
-      letter-spacing: 1px;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+      font-family: -apple-system, SF Pro Display, sans-serif;
     }
 
     .copy-btn {
       width: 100%;
       border: none;
       border-radius: 999px;
-      background: var(--green);
-      color: #fff;
-      font-size: 17px;
+      background: linear-gradient(135deg, #e5c05d, #c4962c);
+      color: #0b0b0d;
+      font-size: 16px;
       font-weight: 700;
-      padding: 14px 18px;
+      padding: 15px 20px;
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(37, 211, 102, 0.25);
-      transition: transform 0.15s ease, background 0.2s ease;
+      box-shadow: 0 8px 20px rgba(196, 150, 44, 0.35);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .copy-btn:active {
       transform: scale(0.98);
-      background: var(--green-dark);
+      background: #b58925;
     }
 
-    .tips {
-      margin-top: 14px;
-      font-size: 14px;
-      line-height: 1.7;
-      color: #555;
-    }
-
-    .tips strong {
-      color: #111;
-    }
-
-    .tips .code {
-      color: var(--green-dark);
-      font-weight: 700;
-    }
-
-    .gif-wrapper {
-      margin-top: 18px;
+    /* 极简步骤条替代卡顿 GIF */
+    .steps-container {
+      margin-top: 24px;
+      background: #131416;
       border-radius: 14px;
-      overflow: hidden;
-      background: #f7f7f7;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      padding: 16px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: left;
     }
 
-    .gif {
-      display: block;
-      width: 100%;
-      height: auto;
+    .step-item {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #b0b0b5;
+      margin-bottom: 10px;
     }
 
-    .fallback {
-      display: none;
-      padding: 18px;
-      font-size: 14px;
-      color: #666;
-      line-height: 1.7;
-      text-align: center;
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-highlight {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
     }
 
     .toast {
       position: fixed;
-      top: 22px;
+      top: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(-120px);
-      background: #222;
-      color: #fff;
-      padding: 12px 20px;
+      background: rgba(212, 175, 55, 0.95);
+      color: #0b0b0d;
+      padding: 12px 24px;
       border-radius: 999px;
       font-size: 14px;
+      font-weight: 600;
       z-index: 9999;
-      transition: transform 0.35s ease;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
       white-space: nowrap;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
     .toast.show {
       transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-      background: var(--green);
-    }
-
-    @media (max-width: 420px) {
-      .card-inner {
-        padding: 22px 16px 18px;
-      }
-
-      .title {
-        font-size: 24px;
-      }
-
-      .wxid {
-        font-size: 28px;
-      }
-
-      .copy-btn {
-        font-size: 16px;
-      }
     }
   </style>
 </head>
@@ -243,42 +235,40 @@
   <div class="toast" id="toast"></div>
 
   <div class="card">
-    <div class="top-bar"></div>
+    <div class="top-gold-line"></div>
 
     <div class="card-inner">
-      <div class="badge">👕 男装咨询 · 当天发货 · 专属优惠</div>
+      <div class="brand-tag">AYTEAM ATELIER · 现货对版</div>
 
-      <div class="icon-wechat">
-        <svg viewBox="0 0 24 24">
-          <path d="M8.69 11.66a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm4.62 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm-6.07 4.73c-3.96 0-7.18-3.22-7.18-7.18S3.28 2 7.24 2c3.7 0 6.75 2.8 7.1 6.37a7.4 7.4 0 0 0-1.67-.17c-4.08 0-7.4 3.3-7.4 7.38 0 1.5.45 2.9 1.22 4.06-.42-.03-.84-.08-1.25-.18v1.74c-2.12-.77-4.07-1.93-4.07-1.93s.03.03-.08-.03c-.9-.52-1.66-1.18-2.26-1.95a7.2 7.2 0 0 1-1.07-3.74c0-.56.06-1.1.19-1.62.38.1.78.17 1.19.2zm11.16 2.05c-2.2 0-4-1.78-4-3.98s1.8-3.98 4-3.98 4 1.78 4 3.98-1.8 3.98-4 3.98zm-1.5-3.18a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6zm3 0a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6z"/>
-        </svg>
+      <div class="title">对接主理人买手微信</div>
+      <div class="subtitle">全网带图找款 · 专属对版细节 · 顺丰现货直发</div>
+
+      <div class="wxid-card" id="wxidCard">
+        <div class="wx-label">WeChat ID</div>
+        <div class="wxid-text" id="wxidText">N88385</div>
       </div>
 
-      <div class="title">添加微信好友</div>
-      <div class="subtitle">复制微信号后，打开微信搜索添加</div>
+      <button class="copy-btn" id="copyBtn">
+        <span>📋</span> 点击一键复制微信号
+      </button>
 
-      <div class="wxid-box" id="wxidBox">
-        <div class="wx-label">微信号</div>
-        <div class="wxid" id="wxidText">N88385</div>
-      </div>
-
-      <button class="copy-btn" id="copyBtn">📋 点击复制微信号</button>
-
-      <div class="tips">
-        复制后打开微信 → 搜索添加<br />
-        添加时发送暗号 <span class="code">【ins】</span> 获取专属优惠
-      </div>
-
-      <div class="gif-wrapper">
-        <img
-          class="gif"
-          src="https://cdn.jsdelivr.net/gh/Jackayyy/AYTEAM@main/wx.GIF"
-          alt="添加微信教程"
-          onerror="this.style.display='none';document.getElementById('fallback').style.display='block';"
-        />
-        <div class="fallback" id="fallback">
-          📱 打开微信 → 搜索 <strong>N88385</strong> → 添加好友
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>点击上方按钮，<span class="step-highlight">自动复制微信号</span></div>
         </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>打开微信搜索添加，备注 <span class="step-highlight">【ins】</span> 优先通过</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>发送想要的心仪单品图，买手急速对版找款</div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        支持对版实拍 / 一对一专属服务 / 全程顺丰保价
       </div>
     </div>
   </div>
@@ -286,40 +276,47 @@
   <script>
     const WX_ID = 'N88385';
     const copyBtn = document.getElementById('copyBtn');
-    const wxidBox = document.getElementById('wxidBox');
+    const wxidCard = document.getElementById('wxidCard');
     const toast = document.getElementById('toast');
     let toastTimer;
     let hasFired = false;
 
-    function showToast(message, type = '') {
+    function showToast(message) {
       if (toastTimer) clearTimeout(toastTimer);
       toast.textContent = message;
-      toast.className = 'toast ' + type + ' show';
+      toast.classList.add('show');
       toastTimer = setTimeout(() => {
         toast.classList.remove('show');
-      }, 2000);
+      }, 2500);
     }
 
     function flashBox() {
-      wxidBox.classList.add('copied-flash');
+      wxidCard.classList.add('flash');
       setTimeout(() => {
-        wxidBox.classList.remove('copied-flash');
+        wxidCard.classList.remove('flash');
       }, 500);
     }
 
-    function fireAddEvent() {
+    function firePixelEvent() {
       if (hasFired) return;
       hasFired = true;
 
+      // 同时触发 Contact 和 自定义 add 事件，保证 Meta 数据模型捕捉更精准
       if (typeof fbq !== 'undefined') {
+        fbq('track', 'Contact');
         fbq('trackCustom', 'add');
       }
     }
 
     function handleCopySuccess() {
       flashBox();
-      showToast('✅ 已复制，请打开微信搜索添加', 'success');
-      fireAddEvent();
+      showToast('✅ 微信号已复制！请打开微信搜索添加');
+      firePixelEvent();
+
+      // 尝试自动呼起微信 App（部分系统支持）
+      setTimeout(() => {
+        window.location.href = 'weixin://';
+      }, 600);
     }
 
     function fallbackCopy() {
